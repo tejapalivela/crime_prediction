@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<center><h3 style="color: red;">{{msg}}</h3></center>
+	
+	<title>{{C_type}} in {{state}} upto year {{year}} </title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css"> 
+
+</head>
+
+<body>
+
+
+	<h1 style="text-align: center; font-size: 36px; margin-top: 50px; margin-bottom: 30px; font-weight: bold;">Prediction</h1>
+
+	<center>
+		<br>
+		<h3>"{{C_type}}" Cases in {{state}} upto Year {{year}}</h3>
+	</center>
+	<div class="container">
+		<canvas id="myChart"></canvas>
+	</div>
+
+
+<script>
+	var ctx = document.getElementById("myChart").getContext('2d');
+	var counts = {{pred_data}};
+	var years = {{ years|safe }};
+	var C_type = "{{C_type|safe}}";
+	console.log(counts)
+	var myChart = new Chart(ctx, {
+  	type: 'bar',
+  	data: {
+        labels:years,
+    	   datasets: [{
+            type: 'bar',
+            label: C_type,
+            data: counts,
+            backgroundColor: 'grey'
+           },{
+            type: 'line',
+            label: C_type,
+            fill: false,
+            borderWidth: 4,
+            data: counts,
+            borderColor: 'red'
+           }]
+  	  },
+	options:{
+		title:{
+			display:true,
+			fontSize:25
+		},
+		scales: {
+			yAxes: [{
+			scaleLabel: {
+				display: true,
+				labelString: 'Number Of Crimes'
+			},
+			ticks: {
+                  fontColor: "red", // this here
+            },
+			}],
+			xAxes: [{
+			scaleLabel: {
+				display: true,
+				labelString: 'Years'
+			},
+			ticks: {
+                  fontColor: "red", // this here
+            },
+			}]
+		} ,
+		legend:{
+			position:'right',
+			labels:{
+				fontColor:'black'
+			}
+		}
+
+	}
+	
+
+	});
+
+  
+</script>
+
+
+
+
+<div>
+	<h1 style="text-align: center; font-size: 36px; margin-top: 50px; margin-bottom: 30px; font-weight: bold;">Analysis</h1>
+
+<button id="analysisButton">Click to get analysis of the data</button>
+
+	<table class="table table-striped">
+		<tr  class="bg-info">
+			<th>Crime Year</th>
+			<th>Cases occured</th>
+			<th>changeByYear</th>
+			<th>increasePercent</th>
+			<th>crimeRatebyYear</th>
+		</tr>
+		<tbody id="myTable">
+		</tbody>
+	</table>	
+
+
+<script>
+	let changeByYear = [];
+	let percentageByYear = [];
+	let crimeRate = [];
+	var count=0;
+    changeByYear[0]=0;
+	percentageByYear[0]=0;
+	crimeRate[0]=0;
+
+for(var i=1;i< 27; i++)
+{
+	changeByYear[i]=counts[i]-counts[i-1];
+	percentageByYear[i]=(changeByYear[i]/counts[i-1])*100;
+
+	if(percentageByYear[i]<12)  
+	crimeRate[i]="low";
+	if(6<percentageByYear[i]&&percentageByYear[i]<12)
+	crimeRate[i]="moderate";
+	if(percentageByYear[i]>12)
+	{
+	crimeRate[i]="high";
+	count=count+1;
+	}
+}	
+
+// add event listener to the button
+document.getElementById("analysisButton").addEventListener("click", function() {
+	buildTable(years,counts,changeByYear,percentageByYear);
+});
+
+function buildTable(data,counts){
+	var table = document.getElementById('myTable')
+
+	var row = `<tr>
+						<td>${data[0]}</td>
+						<td>${counts[0]}</td>
+						<td>${changeByYear[0]}</td>
+						<td>${percentageByYear[0]}</td>
+						<td>${crimeRate[0]}</td>
+						
+				  </tr>`
+		table.innerHTML += row
+
+	for (var i = 1; i < 16; i++){
+		var row = `<tr>
+						<td>${data[i]}</td>
+						<td>${counts[i]}</td>
+						<td>${changeByYear[i]}</td>
+						<td>${percentageByYear[i]}</td>
+						<td>${crimeRate[i]}</td>
+				  </tr>`
+		table.innerHTML += row
+	}
+
+	console.log(count)
+	if (count >= 5) {
+  var header = document.createElement("h2");
+  header.innerHTML = "{{C_type}} cases increase rate is higher in {{state}}";
+  document.body.appendChild(header);
+}
+if (count>=3 && count < 5) {
+  var header = document.createElement("h2");
+  header.innerHTML = "{{C_type}} increase rate is moderate in {{state}}";
+  document.body.appendChild(header);
+}
+if(count<3){
+	var header = document.createElement("h2");
+  header.innerHTML = "{{C_type}} increase rate is low in {{state}}";
+  document.body.appendChild(header);
+}
+
+}
+
+</script>
+</div>
+
+
+
+</body>
+
+</html>

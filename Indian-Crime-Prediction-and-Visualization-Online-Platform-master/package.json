@@ -1,0 +1,12 @@
+{
+  "name": "indian-crime-prediction-and-visualization-online-platform-master",
+  "version": "1.0.0",
+  "description": "It a python based web application which runs Machine Learning algorithm in the back-end for prediction purposes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
